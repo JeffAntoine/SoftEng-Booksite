@@ -149,11 +149,6 @@
              <li class="nav-item px-lg-4">
                 <a class="nav-link text-uppercase text-expanded" href="LoginHTML.jsp">Log In</a>
             </li>
-            <li>
-            	<font color="white" ><i> Welcome, ${username} </i></font><br/>
-            	<font color= "white" > <a class="nav-link text-uppercase text-expanded" href="userProfileHTML.jsp" > Profile </a></font>
-           
-            </li>
            </ul>
         </div>
       </div>

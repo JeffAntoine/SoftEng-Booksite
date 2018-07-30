@@ -18,7 +18,7 @@
         public class Comment {
                 String URL = "jdbc:mysql://localhost:3306/geek_text";
                 String USERNAME = "root";
-                String PASSWORD = "root";
+                String PASSWORD = "1122";
 
                 Connection connection = null;
                 PreparedStatement insertComment = null;

@@ -41,7 +41,7 @@
         {
             String URL = "jdbc:mysql://localhost:3306/geek_text";
             String USERNAME = "root";
-            String PASSWORD = "root";
+            String PASSWORD = "1122";
 
             Connection connection = null;
             PreparedStatement selectBook = null;
@@ -118,10 +118,111 @@
                   {
                       System.out.println (book.insert(user, bookId, title, null, price));
                   }
-
             }
-            
          %>
+         
+         
+         <!-- JEFFS JSP BELOW-->
+         <%!
+        public class Comment {
+                
+                String URL = "jdbc:mysql://localhost:3306/geek_text";
+                String USERNAME = "root";
+                String PASSWORD = "1122";
+                Connection connection = null;
+
+                PreparedStatement insertComment = null;
+                PreparedStatement selectComment = null;
+
+                ResultSet resultSet = null;
+
+                public Comment(){
+                    try {
+                        connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                        
+                        insertComment = connection.prepareStatement(
+                        "INSERT INTO comments (bookid, userName, comment, score, anon, showName)"
+                      + " VALUES (?,?,?,?,?,?);");
+                    }
+                    catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                    try {
+                        connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                        
+                        selectComment = connection.prepareStatement(
+                        "SELECT  bookid, showName,score, comment FROM comments;");
+                    }
+                    catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                }
+                 public ResultSet getComment(){
+                    try{
+                        resultSet = selectComment.executeQuery();
+                    } 
+                    catch (SQLException e){
+                    e.printStackTrace();
+                    }
+                    return resultSet;
+                }
+                public int setComment (String bookid, String userName, String comment, String scores, String anon, String showName){
+                    int result = 0;
+                    String non = "Anonymous";
+                    try{
+                        insertComment.setString(1, bookid);
+                        insertComment.setString(2, userName);
+                        insertComment.setString(3, comment);
+                        insertComment.setString(4, scores);
+                        insertComment.setString(5, anon);
+                        if(anon.equals("anon")){
+                            insertComment.setString(6, non);                            
+                        }
+                        if(anon.equals("public")){
+                            insertComment.setString(6, userName);
+                        }
+
+                        result = insertComment.executeUpdate();
+                    }
+                    catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                    return result;
+                }
+            }
+        %>
+        
+        <%
+            int result = 0;
+            
+            if(request.getParameter("submit") != null){
+                String book_id = new String();
+                String user_name = new String();
+                String commenting = new String();
+                String scores = new String();
+                String anon_input = new String();
+
+                
+                    book_id = bookId;
+                
+                
+                    user_name = user;
+                
+                
+                if (request.getParameter("comment") != null){
+                    commenting = request.getParameter("comment");
+                }
+                if (request.getParameter("scores") != null){
+                    scores = request.getParameter("scores");
+                }
+                if(request.getParameter("anon") != null){
+                    anon_input = request.getParameter("anon");
+                }
+                
+                Comment com = new Comment();
+                result = com.setComment(book_id, user_name, commenting, scores, anon_input, user_name);
+            }
+        %>
   
     <h1 class="site-heading text-center text-white d-none d-lg-block">
       <span class="site-heading-upper text-primary mb-3">ThinkGeek meets Barnes and Noble</span>
@@ -148,11 +249,6 @@
             </li>
              <li class="nav-item px-lg-4">
                 <a class="nav-link text-uppercase text-expanded" href="LoginHTML.jsp">Log In</a>
-            </li>
-            <li>
-            	<font color="white" ><i> Welcome, ${username} </i></font><br/>
-            	<font color= "white" > <a class="nav-link text-uppercase text-expanded" href="userProfileHTML.jsp" > Profile </a></font>
-           
             </li>
            </ul>
         </div>
@@ -191,7 +287,7 @@
                                 <span class="badge badge-success">You Own This!</span>
                                 <span class=" badge badge-secondary">Not Owned</span>
                             </center>
-                            <span class="section-heading-Upper"><b>Author:</b> <td><a href="AuthorBooks.jsp?author=<%= books.getString("author")%>"><%= books.getString("author")%></a></td></span><br>
+                            <span class="section-heading-Upper"><b>Author:</b> <td><a href="<%= books.getString("link")%>"><%= books.getString("author")%></a></td> </span><br>
                             <span class="section-heading-Upper"><b>Book Description:</b> <div align="justify"><td><%= books.getString("description")%></td></div></span>
                   	<span class="section-heading-Upper"><b>Genre:</b> <td><%= books.getString("genre")%></td></span><br>
                   	<span class="section-heading-lower"><b>Publisher:</b> <td><%= books.getString("publisherName")%></td></span><br>
@@ -242,143 +338,79 @@
                             <form class="monospaced">write something nice :) </form>                                
                         </div>
                         -->
+
+
                         <!-- comment box here-->
                         <div class="page-container" >
-                            <form>                   
-                                <div class="form-group">
-                                    <div class="row col-md-12 justify-content-between">
-                                        <input type="email" class="form-control col-md-9" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Headline">
-                                            <div class="row">
-                                                <div class=" top-buffer col-md-12 ">
-                                                    <i class="far fa-star" aria-hidden="true"></i>
-                                                    <i class="far fa-star" aria-hidden="true"></i>
-                                                    <i class="far fa-star" aria-hidden="true"></i>
-                                                    <i class="far fa-star" aria-hidden="true"></i>
-                                                    <i class="far fa-star" aria-hidden="true"></i>
+                            <form name="myForm" action="basicbook.jsp?id=<%= books.getString("bookid")%>" method="POST" >                   
+                                                <div class="form-group">
+                                                    <textarea name="comment" class="form-control top-buffer" id="exampleFormControlTextarea1" rows="3" placeholder="Write something nice"></textarea>
+                                                    <div class="row col-md-12 justify-content-between">
+                                                                                                               
+                                                         <td>rate</td>
+                                                            <td>
+                                                                <select name="scores">
+                                                                    <option value="1">1</option>
+                                                                    <option value="2">2</option>
+                                                                    <option value="3">3</option>
+                                                                    <option value="4">4</option>
+                                                                    <option value="5">5</option>
+                                                                </select>
+                                                            </td>
+                                                            <td>Anon</td>
+                                                            <td>
+                                                                <select name="anon">
+                                                                    <option value="public">Public</option>
+                                                                    <option value="anon">Anonymous</option>
+                                                                </select>
+                                                            </td>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                    </div>
-                                    <textarea class="form-control top-buffer" id="exampleFormControlTextarea1" rows="3" placeholder="Write something nice"></textarea>
-                                </div>
+                                                <div class ="row left-buffer justify-content-between" >
+                                                    <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                                        <small id="emailHelp" class="form-text text-muted">This message does not promote hate of any kind</small>
+                                                    </div>
+                                                    <input type="submit" value="Submit" name="submit" />
+                                                </div>
                                                 
-                                <div class ="row left-buffer justify-content-between" >
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                                        <small id="emailHelp" class="form-text text-muted">This message does not promote hate of any kind</small>
-                                    </div>
-                                    <!-- Rectangular switch will make switch determine ANON status
-                                    <label class="switch left-buffer ">
-                                    <input type="checkbox">
-                                    <span class="slider"></span>
-                                    </label>-->
-                                    <button type="submit" class="btn btn-primary right-buffer">Submit</button>
-                                </div>
-                            </form>
+                                </form>
                         </div>           
                             <!-- old reviews -->
+                             <%
+                                    Comment com = new Comment();
+                                    ResultSet comss = com.getComment();
+                                %>
+                                <div class="page-container">
+                                        <% 
+                                            while (comss.next()) {
+                                        %>
+                                            
+                                        <!-- PAST TABLE CODE--> 
+                                        <div class="comment bg-faded1 col-md-12">
+                                                <div class="info">
+                                                    <div class ="row left-buffer " >
+                                                        <span class="section-heading-Upper"><b><%= comss.getString("showName")%></b></span><br>
+                                                        <span class="left-buffer">Book ID:</span>
+                                                        <a class="left-buffer"><%= comss.getString("bookid")%></a>
+                                                    </div>
+                                                    <div class ="row left-buffer " >
+                                                        <span class="left-buffer">Rate Given:</span>
+                                                        <a class="left-buffer"><%= comss.getString("score")%></a>
+                                                    </div>
+                                                    <p class="top-buffer-text"><%= comss.getString("comment")%></p>
+                                                </div>
+                                                
+                                                
+
+                                         </div>
+
+                                   
+                                     <% }%>
+                                </div>
                         <div class="top-buffer" >
-                            <div class="dropdown">
-                                <button class="btn btn-outline-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Sort By
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    
-                                <a class="dropdown-item" href="#">Newest First</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#">Most Popular</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#">Oldest First</a>
-                                </div>
-                            </div>
+                            
                         </div>
-                        <div class="justify-content-between row col-md-12">
-                            <div  class ="top-buffer" >
-                                <div class="row">
-                                    <div class="col-md-12 ">
-                                        <i class="fas fa-star-half-alt" aria-hidden="true"></i>
-                                        <i class="far fa-star" aria-hidden="true"></i>
-                                        <i class="far fa-star" aria-hidden="true"></i>
-                                        <i class="far fa-star" aria-hidden="true"></i>
-                                        <i class="far fa-star" aria-hidden="true"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <span class="badge badge-success">Verified Purchase</span>
-                                    <i class ="fas fa-user-secret left-buffer" ></i>
-                                    <span class =" monospaced" > (Anon) | 6/18/18</span>
-                                    <!-- <span class=" badge badge-secondary">Not Purchased</span>
-                                    <span class="monospaced">Janest Dosed</span>-->
-                                </div><!-- end row -->                        
-                                <div class="row">
-                                    <div class="col-md-12 row left-buffer">
-                                        <strong class="top-buffer-text" >No Good,</strong>
-                                        <p class="description left-buffer">
-                                        This book sucked honestly, YouTube is butter
-                                    </div>
-                                </div><!-- end row -->           
-                            </div>
-                            <div class="top-buffer right-buffer">
-                                <div class="dropdown">
-                                    <button class="btn btn-outline-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#">Report</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div  class ="top-buffer" >
-                            <div class="row">
-                                <div class="col-md-12 ">
-                                    <i class="fas fa-star" aria-hidden="true"></i>
-                                    <i class="fas fa-star" aria-hidden="true"></i>
-                                    <i class="fas fa-star" aria-hidden="true"></i>
-                                    <i class="fas fa-star" aria-hidden="true"></i>
-                                    <i class="far fa-star" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <span class="badge badge-success">Verified Purchase</span>
-                                <!-- <span class=" badge badge-secondary">Not Purchased</span>-->
-                                <span class="monospaced">Jane Doe  | 4/22/18</span>
-                            </div><!-- end row -->                        
-                            <div class="row">
-                                <div class="col-md-12 row left-buffer">
-                                    <strong class="top-buffer-text" > Has Potential,</strong>
-                                    <p class="description left-buffer">
-                                        This book was pretty helpful, If it was free 10/10
-                                        but its not so 8/10. The introduction was too long for my taste
-                                        couldn't really get into it so I went with my 20 page rule.
-                                        On page 15 it actually got interesting, nonetheless worth the money
-                                        for beginners:)
-                                </div>
-                            </div><!-- end row -->                         
-                        </div>
-                                
-                        <div  class ="top-buffer" >
-                            <div class="row">
-                                <div class="col-md-12 ">
-                                    <i class="fas fa-star" aria-hidden="true"></i>
-                                    <i class="fas fa-star" aria-hidden="true"></i>
-                                    <i class="fas fa-star" aria-hidden="true"></i>
-                                    <i class="far fa-star" aria-hidden="true"></i>
-                                    <i class="far fa-star" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <span class="badge badge-success">Verified Purchase</span>
-                                <!-- <span class=" badge badge-secondary">Not Purchased</span>-->
-                                <span class="monospaced">Doug Dimadome | 11/1/17</span>
-                            </div><!-- end row -->                        
-                            <div class="row">
-                                <div class="col-md-12 row left-buffer">
-                                    <strong class="top-buffer-text" > reasonable price,</strong>
-                                    <p class="description left-buffer">
-                                        it was okay not crazy, check out my shop in Dimsdale
-                                </div>
-                            </div><!-- end row -->
-                            <!-- need to add scroll function so only 2 seen at once-->                       
-                        </div><!-- end old reviews-->
                     </div><!-- end row -->                   
                     </div><!-- end row-->
                 </div>

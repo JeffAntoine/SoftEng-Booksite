@@ -1,6 +1,0 @@
-INDEX VERSION 1.4+/Users/yasmine/Desktop/Software Engineering/GeekText/.metadata/.plugins/org.eclipse.wst.jsdt.core/indexes
-3487639016.index
-1303510586.index
-103671197.index
-1333468222.index
-3999282039.index

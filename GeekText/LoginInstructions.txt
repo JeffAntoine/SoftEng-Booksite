@@ -1,0 +1,6 @@
+1. move files to the geektext forlder/ web inf
+2. overwrite existing files
+3. open sql and execute query that i gave u
+4. run website go to log in
+5. enter right info, should return name + welcome
+6. wrong info should return "wrong password" 

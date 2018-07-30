@@ -33,7 +33,7 @@
         {
             String URL = "jdbc:mysql://localhost:3306/geek_text";
             String USERNAME = "root";
-            String PASSWORD = "root";
+            String PASSWORD = "1122";
             int selectCount;
             
             Connection connection = null;
